@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stuff I Want To Do | Certified_Balls</title>
+    <link rel="icon" href="BALL2.ico" type="image/x-icon">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            position: relative;
+            background: #1a1035;
+            min-height: 100vh;
+        }
+
+        /* Lighter purple gradient background */
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 30%, #4a2f7a, #2a1a4a 80%);
+            z-index: -2;
+            animation: bgShift 20s infinite alternate;
+        }
+
+        @keyframes bgShift {
+            0% { filter: hue-rotate(0deg) brightness(1); }
+            50% { filter: hue-rotate(5deg) brightness(1.05); }
+            100% { filter: hue-rotate(0deg) brightness(1); }
+        }
+
+        /* Canvas for constellation - MORE STARS */
+        #constellation-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* WOBBLY GLASS CURSOR - restored full wobble */
+        #custom-cursor {
+            position: fixed;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px) saturate(200%);
+            -webkit-backdrop-filter: blur(15px) saturate(200%);
+            border: 1.5px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 30px rgba(200, 160, 255, 0.5),
+                        0 0 15px rgba(255, 255, 255, 0.4) inset,
+                        4px 4px 10px rgba(0, 0, 0, 0.1);
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: screen;
+            will-change: transform, left, top;
+            transition: width 0.1s, height 0.1s;
+        }
+
+        #custom-cursor::after {
+            content: '';
+            position: absolute;
+            top: 7px;
+            left: 7px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            filter: blur(3px);
+        }
+
+        /* main content container - flex to center the circle */
+        .content-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* WOBBLY CIRCLE GLASS CARD */
+        .glass-circle {
+            width: min(700px, 90vw);
+            aspect-ratio: 1/1;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            padding: 60px 40px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2),
+                        0 0 0 1px rgba(255, 255, 255, 0.15) inset,
+                        0 0 50px rgba(200, 160, 255, 0.2);
+            color: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            animation: circleWobble 8s infinite ease-in-out;
+            transform-origin: center center;
+        }
+
+        @keyframes circleWobble {
+            0%, 100% {
+                border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%;
+                transform: scale(1) translate(0, 0);
+            }
+            20% {
+                border-radius: 51% 49% 52% 48% / 48% 52% 49% 51%;
+                transform: scale(1.01) translate(-2px, 1px);
+            }
+            40% {
+                border-radius: 48% 52% 47% 53% / 53% 47% 52% 48%;
+                transform: scale(0.99) translate(3px, -1px);
+            }
+            60% {
+                border-radius: 52% 48% 53% 47% / 47% 53% 48% 52%;
+                transform: scale(1.01) translate(-1px, -2px);
+            }
+            80% {
+                border-radius: 47% 53% 48% 52% / 52% 48% 53% 47%;
+                transform: scale(0.99) translate(2px, 2px);
+            }
+        }
+
+        /* iPhone-style back button */
+        .back-btn {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px) saturate(180%);
+            -webkit-backdrop-filter: blur(15px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: rgba(255, 255, 255, 0.9);
+            padding: 12px 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            letter-spacing: 1px;
+            border-radius: 50px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            transition: all 0.25s ease;
+            z-index: 1000;
+            cursor: none;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.35);
+            color: white;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* page title */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 20px rgba(200, 160, 255, 0.3);
+            font-family: 'Poppins', 'Montserrat', sans-serif;
+            color: white;
+            text-align: center;
+            opacity: 0.95;
+        }
+
+        /* list styling */
+        .goals-list {
+            list-style: none;
+            padding: 0 20px;
+        }
+
+        .goals-list li {
+            margin: 16px 0;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 40px;
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .goals-list li:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .goals-list li::before {
+            content: '★';
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
+            margin-right: 12px;
+            display: inline-block;
+        }
+
+        /* subtle footer */
+        .footer-note {
+            text-align: center;
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Menu styles */
+        .menu-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 70;
+        }
+
+        .menu-button {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            cursor: none;
+            pointer-events: auto;
+        }
+
+        .dot {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dot:nth-child(1) { top: 8px; left: 50%; transform: translateX(-50%); }
+        .dot:nth-child(2) { top: 17px; left: 50%; transform: translateX(-50%); }
+        .dot:nth-child(3) { top: 26px; left: 50%; transform: translateX(-50%); }
+
+        .menu-dropdown {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            display: none;
+            min-width: 160px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.15);
+            transition: 0.3s;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 2px;
+            bottom: 2px;
+            background: rgba(255, 255, 255, 0.7);
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background: rgba(170, 120, 255, 0.3);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+            background: white;
+        }
+
+        /* mobile adjustments */
+        @media (max-width: 600px) {
+            .glass-circle { padding: 40px 20px; }
+            h1 { font-size: 2rem; }
+            .goals-list li { font-size: 1rem; padding: 10px 15px; }
+            .back-btn { top: 20px; left: 20px; padding: 8px 20px; }
+            #custom-cursor { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    
+    <!-- Canvas for constellation -->
+    <canvas id="constellation-canvas"></canvas>
+
+    <!-- cursor -->
+    <div id="custom-cursor"></div>
+
+    <!-- back button -->
+    <a href="index.html" class="back-btn" id="back-btn">← Back</a>
+
+    <!-- big circle -->
+    <div class="content-wrapper">
+        <div class="glass-circle">
+            <h1>✦ what i want to do ✦</h1>
+
+            <ul class="goals-list">
+                <li>Build a TARS robot</li>
+                <li>finish learning python</li>
+                <li>Learn more languages</li>
+                <li>Study aerospace engineering</li>
+                <li>earn a 1000$ </li>
+                <li>Build a drone</li>
+            </ul>
+
+            <div class="footer-note">dreams never stopp..</div>
+        </div>
+    </div>
+
+    <!-- the menu -->
+    <div class="menu-container">
+        <div class="menu-button" id="menu-button">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        <div class="menu-dropdown" id="menu-dropdown">
+            <div class="menu-item">
+                <span>Optimize</span>
+                <label class="switch">
+                    <input type="checkbox" id="optimize-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // Constellation animation 
+            const canvas = document.getElementById('constellation-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            let width, height;
+            let stars = [];
+            let starCount = 120; 
+            
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                initStars();
+            }
+            
+            function initStars() {
+                stars = [];
+                for (let i = 0; i < starCount; i++) {
+                    stars.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        radius: Math.random() * 2.5 + 1,
+                        vx: (Math.random() - 0.5) * 0.15,
+                        vy: (Math.random() - 0.5) * 0.15,
+                        opacity: Math.random() * 0.6 + 0.2
+                    });
+                }
+            }
+            
+            function drawConstellation() {
+                ctx.clearRect(0, 0, width, height);
+                
+                // Update stars
+                stars.forEach(star => {
+                    star.x += star.vx;
+                    star.y += star.vy;
+                    
+                    // Wrap around edges
+                    if (star.x < 0) star.x = width;
+                    if (star.x > width) star.x = 0;
+                    if (star.y < 0) star.y = height;
+                    if (star.y > height) star.y = 0;
+                    
+                    // Draw star
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(220, 190, 255, ${star.opacity})`;
+                    ctx.fill();
+                    
+                    // Add subtle glow to bigger stars
+                    if (star.radius > 2) {
+                        ctx.shadowColor = 'rgba(220, 190, 255, 0.3)';
+                        ctx.shadowBlur = 8;
+                        ctx.fill();
+                        ctx.shadowBlur = 0;
+                    }
+                });
+                
+                // Draw MORE connections between nearby stars
+                for (let i = 0; i < stars.length; i++) {
+                    for (let j = i + 1; j < stars.length; j++) {
+                        const dx = stars[i].x - stars[j].x;
+                        const dy = stars[i].y - stars[j].y;
+                        const distance = Math.hypot(dx, dy);
+                        
+                        // Increased connection distance for more lines
+                        if (distance < 120) {
+                            ctx.beginPath();
+                            ctx.moveTo(stars[i].x, stars[i].y);
+                            ctx.lineTo(stars[j].x, stars[j].y);
+                            ctx.strokeStyle = `rgba(200, 170, 255, ${(1 - distance/120) * 0.2})`;
+                            ctx.lineWidth = 0.6;
+                            ctx.stroke();
+                        }
+                    }
+                }
+                
+                requestAnimationFrame(drawConstellation);
+            }
+            
+            window.addEventListener('resize', resize);
+            resize();
+            initStars();
+            drawConstellation();
+
+            // WOBBLY CURSOR
+            const cursor = document.getElementById('custom-cursor');
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+            let lastMouseX = mouseX;
+            let lastMouseY = mouseY;
+
+            document.addEventListener('mousemove', (e) => {
+                lastMouseX = mouseX;
+                lastMouseY = mouseY;
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+
+                cursor.style.left = mouseX + 'px';
+                cursor.style.top = mouseY + 'px';
+
+                // FULL WOBBLE EFFECT
+                const speedX = mouseX - lastMouseX;
+                const speedY = mouseY - lastMouseY;
+                const speed = Math.hypot(speedX, speedY);
+
+                if (speed > 2) {
+                    const angle = Math.atan2(speedY, speedX);
+                    const stretchX = 1 + Math.min(speed * 0.02, 0.4);
+                    const stretchY = 1 - Math.min(speed * 0.01, 0.2);
+                    
+                    cursor.style.transform = `translate(-50%, -50%) rotate(${angle}rad) scale(${stretchX}, ${stretchY})`;
+                    cursor.style.borderRadius = '40% 60% 50% 50% / 50% 40% 60% 50%';
+                    
+                    if (cursor.wobbleTimeout) clearTimeout(cursor.wobbleTimeout);
+                    cursor.wobbleTimeout = setTimeout(() => {
+                        cursor.style.transform = 'translate(-50%, -50%) scale(1) rotate(0deg)';
+                        cursor.style.borderRadius = '50%';
+                    }, 120);
+                }
+            });
+
+            document.addEventListener('mouseleave', () => cursor.style.opacity = '0');
+            document.addEventListener('mouseenter', () => cursor.style.opacity = '1');
+
+            // back button hover effect
+            const backBtn = document.getElementById('back-btn');
+            if (backBtn) {
+                backBtn.addEventListener('mouseenter', () => {
+                    cursor.style.width = '40px';
+                    cursor.style.height = '40px';
+                });
+
+                backBtn.addEventListener('mouseleave', () => {
+                    cursor.style.width = '34px';
+                    cursor.style.height = '34px';
+                });
+            }
+
+            // Menu functionality
+            const menuButton = document.getElementById('menu-button');
+            const menuDropdown = document.getElementById('menu-dropdown');
+            const optimizeToggle = document.getElementById('optimize-toggle');
+
+            menuButton.addEventListener('click', () => {
+                menuDropdown.style.display = menuDropdown.style.display === 'block' ? 'none' : 'block';
+            });
+
+            optimizeToggle.addEventListener('change', (e) => {
+                const isOn = e.target.checked;
+                const cursor = document.getElementById('custom-cursor');
+                if (cursor) cursor.style.display = isOn ? 'none' : 'block';
+                document.body.style.cursor = isOn ? 'default' : 'none';
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!menuButton.contains(e.target) && !menuDropdown.contains(e.target)) {
+                    menuDropdown.style.display = 'none';
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
