@@ -649,7 +649,7 @@
         </div>
     </div>
 
-    <script>
+<script>
         (function() {
             // Canvas for connection lines
             const canvas = document.getElementById('connection-canvas');
@@ -670,6 +670,11 @@
             
             // Background stars array
             let stars = [];
+            
+            // Helper to check mobile
+            function isMobile() {
+                return window.innerWidth <= 600;
+            }
             
             // Particle explosion function
             function createParticleExplosion(x, y, size) {
@@ -702,7 +707,7 @@
                         
                         pVX *= 0.97;
                         pVY *= 0.97;
-                        pVY += 0.05; // gravity
+                        pVY += 0.05;
                         pX += pVX;
                         pY += pVY;
                         
@@ -720,31 +725,31 @@
                 }
             }
             
-// Create mouse trail dots
-function createTrailDot(x, y) {
-    // Don't create trails on mobile
-    if (isMobile()) return;
-    
-    const trail = document.createElement('div');
-    trail.className = 'trail-dot';
-    trail.style.left = (x - 3) + 'px';
-    trail.style.top = (y - 3) + 'px';
-    trail.style.width = '6px';
-    trail.style.height = '6px';
-    trail.style.background = `rgba(${150 + Math.random() * 105}, ${110 + Math.random() * 70}, 255, 0.6)`;
-    trail.style.boxShadow = `0 0 ${3 + Math.random() * 5}px rgba(200, 160, 255, 0.5)`;
-    document.body.appendChild(trail);
-    
-    let opacity = 0.6;
-    const fadeInterval = setInterval(() => {
-        opacity -= 0.08;
-        trail.style.opacity = opacity;
-        if (opacity <= 0) {
-            clearInterval(fadeInterval);
-            trail.remove();
-        }
-    }, 20);
-}
+            // Create mouse trail dots
+            function createTrailDot(x, y) {
+                // Don't create trails on mobile
+                if (isMobile()) return;
+                
+                const trail = document.createElement('div');
+                trail.className = 'trail-dot';
+                trail.style.left = (x - 3) + 'px';
+                trail.style.top = (y - 3) + 'px';
+                trail.style.width = '6px';
+                trail.style.height = '6px';
+                trail.style.background = `rgba(${150 + Math.random() * 105}, ${110 + Math.random() * 70}, 255, 0.6)`;
+                trail.style.boxShadow = `0 0 ${3 + Math.random() * 5}px rgba(200, 160, 255, 0.5)`;
+                document.body.appendChild(trail);
+                
+                let opacity = 0.6;
+                const fadeInterval = setInterval(() => {
+                    opacity -= 0.08;
+                    trail.style.opacity = opacity;
+                    if (opacity <= 0) {
+                        clearInterval(fadeInterval);
+                        trail.remove();
+                    }
+                }, 20);
+            }
             
             // Update glow for buttons based on cursor proximity
             function updateButtonGlow(x, y) {
@@ -871,7 +876,6 @@ function createTrailDot(x, y) {
                     
                     // Velocity
                     if (parentVelocity) {
-                        // Inherit parent velocity with some randomness
                         this.vx = parentVelocity.vx + (Math.random() - 0.5) * 0.8;
                         this.vy = parentVelocity.vy + (Math.random() - 0.5) * 0.8;
                     } else {
@@ -887,15 +891,12 @@ function createTrailDot(x, y) {
                 }
                 
                 split() {
-                    // Only split if big enough
                     if (this.targetSize < 30) return;
                     
-                    // Create particle explosion
                     createParticleExplosion(this.x, this.y, this.targetSize);
                     
-                    const newSize = this.targetSize * 0.5; // Smaller splits for smoother effect
+                    const newSize = this.targetSize * 0.5;
                     
-                    // Create two new bubbles
                     const bubble1 = new Bubble(
                         this.x - this.targetSize * 0.4,
                         this.y - this.targetSize * 0.3,
@@ -912,7 +913,6 @@ function createTrailDot(x, y) {
                     
                     bubbles.push(bubble1, bubble2);
                     
-                    // Smooth removal with fade
                     this.element.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
                     this.element.style.opacity = '0';
                     this.element.style.transform = 'translate(-50%, -50%) scale(0)';
@@ -928,41 +928,36 @@ function createTrailDot(x, y) {
                 }
                 
                 update() {
-                    // Mouse avoidance - RESTORED WOBBLINESS
-                    if (Math.random() < 0.3) { // Increased from 0.2
+                    if (Math.random() < 0.3) {
                         const dx = this.x - mouseX;
                         const dy = this.y - mouseY;
                         const distToMouse = Math.hypot(dx, dy);
-                        const influenceRadius = 150; // Increased from 120
+                        const influenceRadius = 150;
 
                         if (distToMouse < influenceRadius) {
-                            const force = (1 - distToMouse / influenceRadius) * 1.2; // Increased from 0.8
+                            const force = (1 - distToMouse / influenceRadius) * 1.2;
                             const angle = Math.atan2(dy, dx);
                             this.vx += Math.cos(angle) * force;
                             this.vy += Math.sin(angle) * force;
                         }
                     }
 
-                    // Gentle floating motion - RESTORED WOBBLINESS
-                    if (Math.random() < 0.15) { // Increased from 0.1
-                        this.floatAngle += 0.01; // Increased from 0.005
-                        this.vx += Math.cos(this.floatAngle) * 0.02; // Increased from 0.01
+                    if (Math.random() < 0.15) {
+                        this.floatAngle += 0.01;
+                        this.vx += Math.cos(this.floatAngle) * 0.02;
                         this.vy += Math.sin(this.floatAngle) * 0.02;
                     }
 
-                    // Damping - REDUCED FOR WOBBLINESS
-                    this.vx *= 0.96; // Reduced from 0.98
+                    this.vx *= 0.96;
                     this.vy *= 0.96;
                     
-                    // Update position
                     this.x += this.vx;
                     this.y += this.vy;
                     
-                    // Bounce off edges with damping
                     const margin = this.targetSize / 2;
                     if (this.x < margin) {
                         this.x = margin;
-                        this.vx *= -0.6; // Reduced damping for more bounce
+                        this.vx *= -0.6;
                     }
                     if (this.x > window.innerWidth - margin) {
                         this.x = window.innerWidth - margin;
@@ -977,10 +972,8 @@ function createTrailDot(x, y) {
                         this.vy *= -0.6;
                     }
                     
-                    // Pulse effect
-                    const pulse = 1 + Math.sin(Date.now() * 0.003 * this.pulseSpeed + this.pulseOffset) * 0.05; // Increased from 0.03
+                    const pulse = 1 + Math.sin(Date.now() * 0.003 * this.pulseSpeed + this.pulseOffset) * 0.05;
                     
-                    // Update DOM
                     this.element.style.left = this.x + 'px';
                     this.element.style.top = this.y + 'px';
                     this.element.style.transform = `translate(-50%, -50%) scale(${pulse})`;
@@ -1017,132 +1010,96 @@ function createTrailDot(x, y) {
                 }
             }
 
-  // Initialize bubbles with mobile detection
-function initBubbles() {
-    // Check if mobile
-    const isMobile = window.innerWidth <= 600;
-    
-    if (isMobile) {
-        // Mobile: fewer, smaller bubbles, no stars
-        const count = 6;
-        for (let i = 0; i < count; i++) {
-            const x = window.innerWidth * (0.1 + Math.random() * 0.8);
-            const y = window.innerHeight * (0.1 + Math.random() * 0.8);
-            const size = 30 + Math.random() * 40; // Smaller bubbles
-            
-            const bubble = new Bubble(x, y, size);
-            bubbles.push(bubble);
-        }
-        
-        // Mobile: fewer stars, no connections (handled in draw function)
-        const starCount = 20; // Reduced from 50
-        for (let i = 0; i < starCount; i++) {
-            const x = Math.random() * window.innerWidth;
-            const y = Math.random() * window.innerHeight;
-            stars.push(new Star(x, y));
-        }
-    } else {
-        // Desktop: original settings
-        const count = 20;
-        for (let i = 0; i < count; i++) {
-            const x = window.innerWidth * (0.1 + Math.random() * 0.8);
-            const y = window.innerHeight * (0.1 + Math.random() * 0.8);
-            const size = 40 + Math.random() * 60;
-            
-            const bubble = new Bubble(x, y, size);
-            bubbles.push(bubble);
-        }
-        
-        // Desktop: full stars
-        const starCount = 50;
-        for (let i = 0; i < starCount; i++) {
-            const x = Math.random() * window.innerWidth;
-            const y = Math.random() * window.innerHeight;
-            stars.push(new Star(x, y));
-        }
-    }
-}
-
-// Draw connection lines between nearby bubbles
-// Draw connection lines and background stars
-function drawConnections() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw stars (always)
-    stars.forEach(star => {
-        star.update();
-        star.draw(ctx);
-    });
-    
-    // Only draw connections on desktop
-    if (!isMobile()) {
-        // Draw star connections
-        const starConnectionDistance = 80;
-        for (let i = 0; i < stars.length; i++) {
-            for (let j = i + 1; j < stars.length; j++) {
-                const s1 = stars[i];
-                const s2 = stars[j];
-                const dx = s1.x - s2.x;
-                const dy = s1.y - s2.y;
-                const distance = Math.hypot(dx, dy);
+            // Initialize bubbles with mobile detection
+            function initBubbles() {
+                const mobile = window.innerWidth <= 600;
                 
-                if (distance < starConnectionDistance) {
-                    const opacity = (1 - distance / starConnectionDistance) * 0.1;
-                    ctx.beginPath();
-                    ctx.moveTo(s1.x, s1.y);
-                    ctx.lineTo(s2.x, s2.y);
-                    ctx.strokeStyle = `rgba(200, 160, 255, ${opacity})`;
-                    ctx.lineWidth = 0.5;
-                    ctx.stroke();
+                if (mobile) {
+                    const count = 6;
+                    for (let i = 0; i < count; i++) {
+                        const x = window.innerWidth * (0.1 + Math.random() * 0.8);
+                        const y = window.innerHeight * (0.1 + Math.random() * 0.8);
+                        const size = 30 + Math.random() * 40;
+                        
+                        const bubble = new Bubble(x, y, size);
+                        bubbles.push(bubble);
+                    }
+                    
+                    const starCount = 20;
+                    for (let i = 0; i < starCount; i++) {
+                        const x = Math.random() * window.innerWidth;
+                        const y = Math.random() * window.innerHeight;
+                        stars.push(new Star(x, y));
+                    }
+                } else {
+                    const count = 20;
+                    for (let i = 0; i < count; i++) {
+                        const x = window.innerWidth * (0.1 + Math.random() * 0.8);
+                        const y = window.innerHeight * (0.1 + Math.random() * 0.8);
+                        const size = 40 + Math.random() * 60;
+                        
+                        const bubble = new Bubble(x, y, size);
+                        bubbles.push(bubble);
+                    }
+                    
+                    const starCount = 50;
+                    for (let i = 0; i < starCount; i++) {
+                        const x = Math.random() * window.innerWidth;
+                        const y = Math.random() * window.innerHeight;
+                        stars.push(new Star(x, y));
+                    }
                 }
             }
-        }
-        
-        // Draw bubble connections
-        const connectionDistance = 150;
-        for (let i = 0; i < bubbles.length; i++) {
-            for (let j = i + 1; j < bubbles.length; j++) {
-                const b1 = bubbles[i];
-                const b2 = bubbles[j];
 
-                const dx = b1.x - b2.x;
-                const dy = b1.y - b2.y;
-                const distance = Math.hypot(dx, dy);
+            // Draw connection lines
+            function drawConnections() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                stars.forEach(star => {
+                    star.update();
+                    star.draw(ctx);
+                });
+                
+                if (!isMobile()) {
+                    const starConnectionDistance = 80;
+                    for (let i = 0; i < stars.length; i++) {
+                        for (let j = i + 1; j < stars.length; j++) {
+                            const s1 = stars[i];
+                            const s2 = stars[j];
+                            const dx = s1.x - s2.x;
+                            const dy = s1.y - s2.y;
+                            const distance = Math.hypot(dx, dy);
+                            
+                            if (distance < starConnectionDistance) {
+                                const opacity = (1 - distance / starConnectionDistance) * 0.1;
+                                ctx.beginPath();
+                                ctx.moveTo(s1.x, s1.y);
+                                ctx.lineTo(s2.x, s2.y);
+                                ctx.strokeStyle = `rgba(200, 160, 255, ${opacity})`;
+                                ctx.lineWidth = 0.5;
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                    
+                    const connectionDistance = 150;
+                    for (let i = 0; i < bubbles.length; i++) {
+                        for (let j = i + 1; j < bubbles.length; j++) {
+                            const b1 = bubbles[i];
+                            const b2 = bubbles[j];
+                            const dx = b1.x - b2.x;
+                            const dy = b1.y - b2.y;
+                            const distance = Math.hypot(dx, dy);
 
-                if (distance < connectionDistance) {
-                    const opacity = (1 - distance / connectionDistance) * 0.15;
-
-                    ctx.beginPath();
-                    ctx.moveTo(b1.x, b1.y);
-                    ctx.lineTo(b2.x, b2.y);
-                    ctx.strokeStyle = `rgba(200, 160, 255, ${opacity})`;
-                    ctx.lineWidth = 1.5;
-                    ctx.stroke();
-                }
-            }
-        }
-    }
-}
-                // Draw bubble connections
-                const connectionDistance = 150;
-                for (let i = 0; i < bubbles.length; i++) {
-                    for (let j = i + 1; j < bubbles.length; j++) {
-                        const b1 = bubbles[i];
-                        const b2 = bubbles[j];
-
-                        const dx = b1.x - b2.x;
-                        const dy = b1.y - b2.y;
-                        const distance = Math.hypot(dx, dy);
-
-                        if (distance < connectionDistance) {
-                            const opacity = (1 - distance / connectionDistance) * 0.15;
-
-                            ctx.beginPath();
-                            ctx.moveTo(b1.x, b1.y);
-                            ctx.lineTo(b2.x, b2.y);
-                            ctx.strokeStyle = `rgba(200, 160, 255, ${opacity})`;
-                            ctx.lineWidth = 1.5;
-                            ctx.stroke();
+                            if (distance < connectionDistance) {
+                                const opacity = (1 - distance / connectionDistance) * 0.15;
+                                ctx.beginPath();
+                                ctx.moveTo(b1.x, b1.y);
+                                ctx.lineTo(b2.x, b2.y);
+                                ctx.strokeStyle = `rgba(200, 160, 255, ${opacity})`;
+                                ctx.lineWidth = 1.5;
+                                ctx.stroke();
+                            }
                         }
                     }
                 }
@@ -1165,32 +1122,24 @@ function drawConnections() {
                 if (currentTime - lastTime < interval) return;
                 lastTime = currentTime;
                 
-                // Update all bubbles
                 for (let i = bubbles.length - 1; i >= 0; i--) {
                     bubbles[i].update();
                 }
                 
-                // Occasionally add new star
                 if (Math.random() < 0.005) {
                     const x = Math.random() * window.innerWidth;
                     const y = Math.random() * window.innerHeight;
                     stars.push(new Star(x, y));
                 }
                 
-                // Draw connections and stars
                 drawConnections();
             }
-            // Helper to check mobile
-function isMobile() {
-    return window.innerWidth <= 600;
-}
 
             // Initialize
             window.addEventListener('resize', resize);
             resize();
             initBubbles();
             requestAnimationFrame(animate);
-            
 
             // Button hover effects
             const buttons = document.querySelectorAll('.btn, .social-btn');
@@ -1212,7 +1161,6 @@ function isMobile() {
             const nameElement = document.getElementById('flicker-name');
             const originalText = nameElement.textContent;
             
-            // Wrap each letter in a span
             nameElement.innerHTML = '';
             const letters = originalText.split('');
             const letterSpans = [];
@@ -1226,9 +1174,7 @@ function isMobile() {
                 letterSpans.push(span);
             });
             
-            // Random flicker function - very subtle and slow
             function randomFlicker() {
-                // Randomly select 1-2 letters to flicker
                 const flickerCount = 1 + Math.floor(Math.random() * 2);
                 const selectedIndices = [];
                 
@@ -1239,28 +1185,23 @@ function isMobile() {
                     }
                 }
                 
-                // Apply subtle flicker to selected letters
                 selectedIndices.forEach(index => {
                     const span = letterSpans[index];
                     
-                    // Subtle opacity and glow reduction
                     span.style.transition = 'text-shadow 1.5s ease, opacity 1.5s ease';
                     span.style.opacity = '0.7';
                     span.style.textShadow = '0 0 15px #c49bff, 0 0 30px #9f6eff';
                     
-                    // Slowly restore
                     setTimeout(() => {
                         span.style.opacity = '1';
                         span.style.textShadow = '0 0 30px #c49bff, 0 0 60px #9f6eff';
                     }, 1500);
                 });
                 
-                // Schedule next flicker - very slow (3-5 seconds)
                 const nextFlicker = 3000 + Math.random() * 2000;
                 setTimeout(randomFlicker, nextFlicker);
             }
             
-            // Start flicker effect after a delay
             setTimeout(randomFlicker, 2000);
 
             // Menu functionality
@@ -1281,12 +1222,11 @@ function isMobile() {
                 document.body.style.cursor = isOn ? 'default' : 'none';
             });
 
-            // combs
+            // Easter eggs
             const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
             let konamiIndex = 0;
             
             document.addEventListener('keydown', (e) => {
-                // Konami code easter egg
                 if (e.key === konamiCode[konamiIndex]) {
                     konamiIndex++;
                     if (konamiIndex === konamiCode.length) {
@@ -1297,17 +1237,15 @@ function isMobile() {
                     konamiIndex = 0;
                 }
                 
-                // Other easter eggs
                 if (e.key === '`' || e.key === '~') {
-                    triggerEasterEgg2(); // Toggle rainbow mode
+                    triggerEasterEgg2();
                 }
                 
                 if (e.key === '?' && e.shiftKey) {
-                    triggerEasterEgg3(); // Help menu
+                    triggerEasterEgg3();
                 }
             });
             
-            // easter eg??!!?!??
             function triggerEasterEgg1() {
                 const message = document.createElement('div');
                 message.textContent = 'goddamn some one found it?';
@@ -1322,7 +1260,6 @@ function isMobile() {
                 message.style.pointerEvents = 'none';
                 document.body.appendChild(message);
                 
-                // Create many particles across screen
                 for (let i = 0; i < 50; i++) {
                     setTimeout(() => {
                         createParticleExplosion(
@@ -1336,26 +1273,20 @@ function isMobile() {
                 setTimeout(() => message.remove(), 3000);
             }
             
-            // RAINBOWWWWWWWWWW
             function triggerEasterEgg2() {
                 const isRainbow = document.body.style.filter;
                 if (isRainbow) {
                     document.body.style.filter = '';
-                    console.log('🌈 Rainbow mode OFF');
                 } else {
                     document.body.style.filter = 'hue-rotate(360deg) saturate(1.5)';
-                    const hueRotate = setInterval(() => {
-                        let hue = 0;
-                        return () => {
-                            hue = (hue + 5) % 360;
-                            document.body.style.filter = `hue-rotate(${hue}deg) saturate(1.5)`;
-                        };
+                    let hue = 0;
+                    setInterval(() => {
+                        hue = (hue + 5) % 360;
+                        document.body.style.filter = `hue-rotate(${hue}deg) saturate(1.5)`;
                     }, 50);
-                    console.log('🌈 Rainbow mode ON!');
                 }
             }
             
-            // Easter egg 3: Help menu
             function triggerEasterEgg3() {
                 const help = document.createElement('div');
                 help.style.position = 'fixed';
@@ -1403,13 +1334,11 @@ function isMobile() {
                 wobbleTime += 0.02;
                 
                 wobbleBtns.forEach((btn, index) => {
-                    // Different wobble for each button based on index
                     const offset = index * 0.5;
                     const wobbleX = Math.sin(wobbleTime + offset) * 1.5;
                     const wobbleY = Math.cos(wobbleTime * 0.8 + offset) * 1;
                     const wobbleRotate = Math.sin(wobbleTime * 0.5 + offset) * 0.5;
                     
-                    // Don't wobble if hovering
                     if (!btn.matches(':hover')) {
                         btn.style.transform = `translate(${wobbleX}px, ${wobbleY}px) rotate(${wobbleRotate}deg)`;
                     }
@@ -1418,11 +1347,11 @@ function isMobile() {
                 requestAnimationFrame(buttonWobble);
             }
 
-            // Start wobble
             buttonWobble();
         })();
     </script>
 </body>
 
 </html>
+
 
