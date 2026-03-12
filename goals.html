@@ -333,13 +333,120 @@
             background: white;
         }
 
-        /* mobile adjustments */
+        /* ===== MOBILE-ONLY BOTTOM SHEET STYLES ===== */
+        /* Desktop untouched, only applies on phones */
         @media (max-width: 600px) {
-            .glass-circle { padding: 40px 20px; }
-            h1 { font-size: 2rem; }
-            .goals-list li { font-size: 1rem; padding: 10px 15px; }
-            .back-btn { top: 20px; left: 20px; padding: 8px 20px; }
-            #custom-cursor { display: none; }
+            /* Hide cursor on mobile */
+            #custom-cursor {
+                display: none;
+            }
+            
+            /* Override the centered flex layout */
+            .content-wrapper {
+                min-height: auto;
+                display: block;
+                padding: 0;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                top: auto;
+                z-index: 50;
+            }
+            
+            /* Transform circle into bottom sheet */
+            .glass-circle {
+                width: 100%;
+                aspect-ratio: auto;
+                border-radius: 40px 40px 0 0;
+                padding: 30px 25px 40px;
+                margin: 0;
+                animation: sheetWobble 6s infinite ease-in-out;
+                max-height: 80vh;
+                overflow-y: auto;
+                position: relative;
+                border-bottom: none;
+                box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
+            }
+            
+            /* Add a subtle handle at the top */
+            .glass-circle::before {
+                content: '';
+                position: sticky;
+                top: 5px;
+                display: block;
+                width: 60px;
+                height: 5px;
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 10px;
+                margin: 0 auto 20px;
+                backdrop-filter: blur(5px);
+            }
+            
+            /* Gentler wobble for mobile */
+            @keyframes sheetWobble {
+                0%, 100% {
+                    transform: translateY(0) scale(1);
+                }
+                25% {
+                    transform: translateY(-2px) scale(1.002);
+                }
+                50% {
+                    transform: translateY(1px) scale(0.998);
+                }
+                75% {
+                    transform: translateY(-1px) scale(1.002);
+                }
+            }
+            
+            /* Adjust title size and spacing */
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            /* Adjust list items for mobile */
+            .goals-list {
+                padding: 0 10px;
+            }
+            
+            .goals-list li {
+                margin: 12px 0;
+                padding: 12px 15px;
+                font-size: 1rem;
+            }
+            
+            /* Move back button to top center for easier reach */
+            .back-btn {
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 10px 25px;
+                font-size: 0.9rem;
+                z-index: 1001;
+                white-space: nowrap;
+            }
+            
+            .back-btn:hover {
+                transform: translateX(-50%) translateY(-2px);
+            }
+            
+            /* Adjust menu position */
+            .menu-container {
+                top: 20px;
+                right: 20px;
+                z-index: 1002;
+            }
+            
+            /* Constellation optimization for mobile */
+            #constellation-canvas {
+                opacity: 0.6;
+            }
+            
+            .footer-note {
+                margin-top: 20px;
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
@@ -558,4 +665,5 @@
         })();
     </script>
 </body>
+
 </html>
