@@ -566,18 +566,26 @@
         }
 
         /* Mobile optimization (lmao loser phone user) */
-        @media (max-width: 600px) {
-            .button-container { flex-direction: column; gap: 1.2rem; }
-            .btn { min-width: 260px; padding: 1.2rem 2.5rem; font-size: 16px; touch-action: manipulation; }
-            .social-container { bottom: 20px; right: 20px; gap: 12px; }
-            .social-btn { width: 48px; height: 48px; touch-action: manipulation; }
-            .social-btn svg { width: 24px; height: 24px; }
-            .menu-button { width: 44px; height: 44px; }
-            .dot { width: 5px; height: 5px; }
-            #custom-cursor { display: none; }
-            .center-content { padding: 2rem 1.5rem; }
-            .main-name { font-size: 1.8rem; }
-            .real-name { font-size: 0.9rem; }
+@media (max-width: 600px) {
+    .button-container { flex-direction: column; gap: 1.2rem; }
+    .btn { min-width: 260px; padding: 1.2rem 2.5rem; font-size: 16px; touch-action: manipulation; }
+    .social-container { bottom: 20px; right: 20px; gap: 12px; }
+    .social-btn { width: 48px; height: 48px; touch-action: manipulation; }
+    .social-btn svg { width: 24px; height: 24px; }
+    .menu-button { width: 44px; height: 44px; }
+    .dot { width: 5px; height: 5px; }
+    #custom-cursor { display: none; }
+    .trail-dot { display: none; }
+    .center-content { padding: 2rem 1.5rem; }
+    .main-name { font-size: 1.8rem; }
+    .real-name { font-size: 0.9rem; }
+    
+    .bubble {
+        backdrop-filter: none;
+        box-shadow: 0 0 10px rgba(170, 120, 255, 0.1); 
+    }
+    
+}
         }
     </style>
 </head>
@@ -712,28 +720,31 @@
                 }
             }
             
-            // Create mouse trail dots
-            function createTrailDot(x, y) {
-                const trail = document.createElement('div');
-                trail.className = 'trail-dot';
-                trail.style.left = (x - 3) + 'px';
-                trail.style.top = (y - 3) + 'px';
-                trail.style.width = '6px';
-                trail.style.height = '6px';
-                trail.style.background = `rgba(${150 + Math.random() * 105}, ${110 + Math.random() * 70}, 255, 0.6)`;
-                trail.style.boxShadow = `0 0 ${3 + Math.random() * 5}px rgba(200, 160, 255, 0.5)`;
-                document.body.appendChild(trail);
-                
-                let opacity = 0.6;
-                const fadeInterval = setInterval(() => {
-                    opacity -= 0.08;
-                    trail.style.opacity = opacity;
-                    if (opacity <= 0) {
-                        clearInterval(fadeInterval);
-                        trail.remove();
-                    }
-                }, 20);
-            }
+// Create mouse trail dots
+function createTrailDot(x, y) {
+    // Don't create trails on mobile
+    if (isMobile()) return;
+    
+    const trail = document.createElement('div');
+    trail.className = 'trail-dot';
+    trail.style.left = (x - 3) + 'px';
+    trail.style.top = (y - 3) + 'px';
+    trail.style.width = '6px';
+    trail.style.height = '6px';
+    trail.style.background = `rgba(${150 + Math.random() * 105}, ${110 + Math.random() * 70}, 255, 0.6)`;
+    trail.style.boxShadow = `0 0 ${3 + Math.random() * 5}px rgba(200, 160, 255, 0.5)`;
+    document.body.appendChild(trail);
+    
+    let opacity = 0.6;
+    const fadeInterval = setInterval(() => {
+        opacity -= 0.08;
+        trail.style.opacity = opacity;
+        if (opacity <= 0) {
+            clearInterval(fadeInterval);
+            trail.remove();
+        }
+    }, 20);
+}
             
             // Update glow for buttons based on cursor proximity
             function updateButtonGlow(x, y) {
@@ -1006,60 +1017,112 @@
                 }
             }
 
-            // Initialize 20 bubbles and background stars
-            function initBubbles() {
-                const count = 20; // Increased from 12
-                for (let i = 0; i < count; i++) {
-                    const x = window.innerWidth * (0.1 + Math.random() * 0.8);
-                    const y = window.innerHeight * (0.1 + Math.random() * 0.8);
-                    const size = 40 + Math.random() * 60;
+  // Initialize bubbles with mobile detection
+function initBubbles() {
+    // Check if mobile
+    const isMobile = window.innerWidth <= 600;
+    
+    if (isMobile) {
+        // Mobile: fewer, smaller bubbles, no stars
+        const count = 6;
+        for (let i = 0; i < count; i++) {
+            const x = window.innerWidth * (0.1 + Math.random() * 0.8);
+            const y = window.innerHeight * (0.1 + Math.random() * 0.8);
+            const size = 30 + Math.random() * 40; // Smaller bubbles
+            
+            const bubble = new Bubble(x, y, size);
+            bubbles.push(bubble);
+        }
+        
+        // Mobile: fewer stars, no connections (handled in draw function)
+        const starCount = 20; // Reduced from 50
+        for (let i = 0; i < starCount; i++) {
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            stars.push(new Star(x, y));
+        }
+    } else {
+        // Desktop: original settings
+        const count = 20;
+        for (let i = 0; i < count; i++) {
+            const x = window.innerWidth * (0.1 + Math.random() * 0.8);
+            const y = window.innerHeight * (0.1 + Math.random() * 0.8);
+            const size = 40 + Math.random() * 60;
+            
+            const bubble = new Bubble(x, y, size);
+            bubbles.push(bubble);
+        }
+        
+        // Desktop: full stars
+        const starCount = 50;
+        for (let i = 0; i < starCount; i++) {
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            stars.push(new Star(x, y));
+        }
+    }
+}
 
-                    const bubble = new Bubble(x, y, size);
-                    bubbles.push(bubble);
-                }
+// Draw connection lines between nearby bubbles
+// Draw connection lines and background stars
+function drawConnections() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw stars (always)
+    stars.forEach(star => {
+        star.update();
+        star.draw(ctx);
+    });
+    
+    // Only draw connections on desktop
+    if (!isMobile()) {
+        // Draw star connections
+        const starConnectionDistance = 80;
+        for (let i = 0; i < stars.length; i++) {
+            for (let j = i + 1; j < stars.length; j++) {
+                const s1 = stars[i];
+                const s2 = stars[j];
+                const dx = s1.x - s2.x;
+                const dy = s1.y - s2.y;
+                const distance = Math.hypot(dx, dy);
                 
-                // Initialize background stars
-                const starCount = 50;
-                for (let i = 0; i < starCount; i++) {
-                    const x = Math.random() * window.innerWidth;
-                    const y = Math.random() * window.innerHeight;
-                    stars.push(new Star(x, y));
+                if (distance < starConnectionDistance) {
+                    const opacity = (1 - distance / starConnectionDistance) * 0.1;
+                    ctx.beginPath();
+                    ctx.moveTo(s1.x, s1.y);
+                    ctx.lineTo(s2.x, s2.y);
+                    ctx.strokeStyle = `rgba(200, 160, 255, ${opacity})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
                 }
             }
+        }
+        
+        // Draw bubble connections
+        const connectionDistance = 150;
+        for (let i = 0; i < bubbles.length; i++) {
+            for (let j = i + 1; j < bubbles.length; j++) {
+                const b1 = bubbles[i];
+                const b2 = bubbles[j];
 
-            // Draw connection lines between nearby bubbles
-            // Draw connection lines and background stars
-            function drawConnections() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                // Draw stars
-                stars.forEach(star => {
-                    star.update();
-                    star.draw(ctx);
-                });
-                
-                // Draw star connections
-                const starConnectionDistance = 80;
-                for (let i = 0; i < stars.length; i++) {
-                    for (let j = i + 1; j < stars.length; j++) {
-                        const s1 = stars[i];
-                        const s2 = stars[j];
-                        const dx = s1.x - s2.x;
-                        const dy = s1.y - s2.y;
-                        const distance = Math.hypot(dx, dy);
-                        
-                        if (distance < starConnectionDistance) {
-                            const opacity = (1 - distance / starConnectionDistance) * 0.1;
-                            ctx.beginPath();
-                            ctx.moveTo(s1.x, s1.y);
-                            ctx.lineTo(s2.x, s2.y);
-                            ctx.strokeStyle = `rgba(200, 160, 255, ${opacity})`;
-                            ctx.lineWidth = 0.5;
-                            ctx.stroke();
-                        }
-                    }
+                const dx = b1.x - b2.x;
+                const dy = b1.y - b2.y;
+                const distance = Math.hypot(dx, dy);
+
+                if (distance < connectionDistance) {
+                    const opacity = (1 - distance / connectionDistance) * 0.15;
+
+                    ctx.beginPath();
+                    ctx.moveTo(b1.x, b1.y);
+                    ctx.lineTo(b2.x, b2.y);
+                    ctx.strokeStyle = `rgba(200, 160, 255, ${opacity})`;
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
                 }
-                
+            }
+        }
+    }
+}
                 // Draw bubble connections
                 const connectionDistance = 150;
                 for (let i = 0; i < bubbles.length; i++) {
@@ -1117,12 +1180,17 @@
                 // Draw connections and stars
                 drawConnections();
             }
+            // Helper to check mobile
+function isMobile() {
+    return window.innerWidth <= 600;
+}
 
             // Initialize
             window.addEventListener('resize', resize);
             resize();
             initBubbles();
             requestAnimationFrame(animate);
+            
 
             // Button hover effects
             const buttons = document.querySelectorAll('.btn, .social-btn');
@@ -1357,3 +1425,4 @@
 </body>
 
 </html>
+
