@@ -128,20 +128,31 @@
                         0 0 0 1px rgba(255, 255, 255, 0.1) inset,
                         0 0 50px rgba(200, 160, 255, 0.2);
             color: rgba(255, 255, 255, 0.95);
-            padding: 25px;
+            padding: 30px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: box-shadow 0.3s ease;
             will-change: transform, left, top;
             pointer-events: auto;
-            overflow: hidden;
-            min-width: 280px;
-            min-height: 280px;
             display: flex;
             flex-direction: column;
+            animation: float 8s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(8px, -5px); }
+            50% { transform: translate(-5px, 8px); }
+            75% { transform: translate(5px, 5px); }
+        }
+
+        .shape:hover {
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3),
+                        0 0 0 1px rgba(255, 255, 255, 0.3) inset,
+                        0 0 60px rgba(200, 160, 255, 0.3);
         }
 
         .shape h2 {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 500;
             margin-bottom: 1rem;
             text-shadow: 0 0 20px rgba(200, 160, 255, 0.3);
@@ -151,7 +162,7 @@
         }
 
         .shape .preview {
-            font-size: 1rem;
+            font-size: 1.1rem;
             line-height: 1.5;
             opacity: 0.9;
             flex: 1;
@@ -161,33 +172,33 @@
             display: none;
         }
 
-        /* shape variations */
+        /* shape variations - BIGGER */
         .shape.circle {
             border-radius: 50%;
-            width: 320px;
-            height: 320px;
+            width: 380px;
+            height: 380px;
         }
 
         .shape.square {
             border-radius: 60px;
-            width: 340px;
-            height: 340px;
+            width: 400px;
+            height: 400px;
         }
 
         .shape.triangle {
-            width: 320px;
-            height: 320px;
+            width: 380px;
+            height: 380px;
             clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-            border-radius: 60px 60px 60px 60px;
+            border-radius: 60px;
         }
 
         .shape.triangle h2 {
-            margin-top: 20px;
+            margin-top: 30px;
         }
 
         .shape.guestbook {
-            width: 140px;
-            height: 140px;
+            width: 150px;
+            height: 150px;
             border-radius: 50%;
             min-width: auto;
             min-height: auto;
@@ -197,31 +208,34 @@
             text-align: center;
             font-size: 1.2rem;
             font-weight: 500;
-            background: rgba(170, 120, 255, 0.2);
+            background: rgba(170, 120, 255, 0.25);
             border-color: rgba(255, 255, 255, 0.4);
-            animation: guestbookFloat 4s infinite ease-in-out;
+            animation: guestbookFloat 5s infinite ease-in-out;
+            padding: 0;
+            line-height: 1.3;
         }
 
         .shape.guestbook:hover {
-            transform: scale(1.05);
-            background: rgba(190, 140, 255, 0.3);
+            transform: scale(1.1);
+            background: rgba(190, 140, 255, 0.35);
         }
 
         @keyframes guestbookFloat {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-15px); }
         }
 
-        /* expanded view */
+        /* expanded view - PURPLE GLASS */
         .expanded-view {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(15px);
-            z-index: 1000;
+            background: rgba(26, 16, 53, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 2000;
             display: none;
             align-items: center;
             justify-content: center;
@@ -235,17 +249,20 @@
         }
 
         .expanded-content {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(25px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 60px;
-            padding: 40px;
-            max-width: 600px;
+            background: rgba(170, 120, 255, 0.15);
+            backdrop-filter: blur(30px) saturate(200%);
+            -webkit-backdrop-filter: blur(30px) saturate(200%);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 80px;
+            padding: 50px;
+            max-width: 700px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
             color: white;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.4),
+                        0 0 0 1px rgba(255, 255, 255, 0.2) inset,
+                        0 0 80px rgba(200, 160, 255, 0.3);
             transform: scale(0.95);
             transition: transform 0.3s ease;
         }
@@ -255,14 +272,19 @@
         }
 
         .expanded-content h2 {
-            font-size: 2.5rem;
+            font-size: 3rem;
+            font-weight: 500;
             margin-bottom: 2rem;
             text-shadow: 0 0 30px rgba(200, 160, 255, 0.5);
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 1rem;
         }
 
         .expanded-content .expanded-body {
-            font-size: 1.2rem;
-            line-height: 1.6;
+            font-size: 1.3rem;
+            line-height: 1.7;
             opacity: 0.95;
         }
 
@@ -273,35 +295,45 @@
 
         .expanded-content .goals-list li {
             margin: 20px 0;
-            padding: 15px 20px;
+            padding: 18px 25px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 40px;
+            border-radius: 50px;
             font-size: 1.2rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .expanded-content .goals-list li::before {
+            content: '✦';
+            color: rgba(200, 160, 255, 0.8);
+            margin-right: 15px;
+            font-size: 1.4rem;
         }
 
         .close-expanded {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            top: 30px;
+            right: 30px;
+            background: rgba(170, 120, 255, 0.2);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             color: white;
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             cursor: pointer;
             transition: all 0.2s ease;
+            z-index: 2001;
+            box-shadow: 0 0 30px rgba(200, 160, 255, 0.3);
         }
 
         .close-expanded:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.1);
+            background: rgba(190, 140, 255, 0.3);
+            transform: scale(1.1) rotate(90deg);
         }
 
         /* connection canvas */
@@ -319,20 +351,19 @@
         @media (max-width: 600px) {
             .shapes-container {
                 overflow-y: auto;
+                padding: 20px;
             }
             
             .shape {
                 position: relative !important;
-                margin: 20px auto;
+                margin: 30px auto;
                 transform: none !important;
                 left: auto !important;
                 top: auto !important;
-            }
-            
-            .shape.circle, .shape.square, .shape.triangle {
-                width: 90%;
-                height: auto;
+                width: 90% !important;
+                height: auto !important;
                 aspect-ratio: 1/1;
+                animation: none;
             }
             
             .shape.triangle {
@@ -340,16 +371,12 @@
             }
             
             .shape.guestbook {
+                width: 140px !important;
+                height: 140px !important;
                 margin: 20px auto;
-                width: 120px;
-                height: 120px;
             }
             
-            #connection-canvas {
-                display: none;
-            }
-            
-            #custom-cursor {
+            #connection-canvas, #custom-cursor {
                 display: none;
             }
             
@@ -371,19 +398,19 @@
 
     <div class="shapes-container" id="shapes-container">
         <!-- about circle -->
-        <div class="shape circle" id="shape-about" style="left: 15%; top: 20%;">
+        <div class="shape circle" id="shape-about" style="left: 10%; top: 15%;">
             <h2>✦ about ✦</h2>
             <div class="preview">
                 16, into planes and building shit. likes interstellar a normal amount. 
             </div>
             <div class="full-content">
-                <p>omar, 16. aerospace engineering student (or aspiring). built this website from scratch. obsessed with planes,  </p>
+                <p>omar, 16. aerospace engineering student (or aspiring). built this website from scratch. obsessed with planes.</p>
                 <p style="margin-top: 1rem;">currently learning python and how to make an AI.</p>
             </div>
         </div>
 
         <!-- goals square -->
-        <div class="shape square" id="shape-goals" style="left: 45%; top: 15%;">
+        <div class="shape square" id="shape-goals" style="left: 42%; top: 12%;">
             <h2>✦ goals ✦</h2>
             <div class="preview">
                 build a TARS robot, finish python, make money, etc.
@@ -393,29 +420,27 @@
                     <li>build a functional TARS robot (with the voice and everything), i even have a written blueprint if anyone could help</li>
                     <li>actually finish learning python and build my own AI</li>
                     <li>earn my first $1000 from my work</li>
-                    <li>build a drone </li>
+                    <li>build a drone</li>
                 </ul>
             </div>
         </div>
 
         <!-- hobbies triangle -->
-        <div class="shape triangle" id="shape-hobbies" style="left: 75%; top: 30%;">
+        <div class="shape triangle" id="shape-hobbies" style="left: 72%; top: 25%;">
             <h2>✦ hobbies ✦</h2>
             <div class="preview">
-                planes
+                planes, coding, Minecraft
             </div>
             <div class="full-content">
                 <p><strong>planes:</strong> know way too much about different aircraft types. drawn a few.</p>
                 <p><strong>coding:</strong> making things look pretty and wobbly.</p>
-                <p><strong>Minecraft:</strong>basically my life</p>
-                <p><strong>:</strong> </p>
-                <p><strong>:</strong> </p>
+                <p><strong>Minecraft:</strong> basically my life</p>
             </div>
         </div>
 
         <!-- guestbook bubble -->
         <div class="shape guestbook" id="shape-guestbook" style="left: 85%; bottom: 15%;" onclick="window.location.href='guestbook.html'">
-             leave a message?
+            leave a<br>message?
         </div>
     </div>
 
@@ -506,7 +531,7 @@
             const ctx = canvas.getContext('2d');
             let width, height;
             let stars = [];
-            let starCount = 80; // fewer for performance
+            let starCount = 100;
 
             function resize() {
                 width = window.innerWidth;
@@ -522,10 +547,10 @@
                     stars.push({
                         x: Math.random() * width,
                         y: Math.random() * height,
-                        radius: Math.random() * 2 + 1,
-                        vx: (Math.random() - 0.5) * 0.1,
-                        vy: (Math.random() - 0.5) * 0.1,
-                        opacity: Math.random() * 0.5 + 0.2
+                        radius: Math.random() * 2.5 + 1,
+                        vx: (Math.random() - 0.5) * 0.08,
+                        vy: (Math.random() - 0.5) * 0.08,
+                        opacity: Math.random() * 0.5 + 0.3
                     });
                 }
             }
@@ -614,7 +639,7 @@
                 }
             });
 
-            // simple connection lines
+            // connection lines
             const connCanvas = document.getElementById('connection-canvas');
             const connCtx = connCanvas.getContext('2d');
             
@@ -644,7 +669,7 @@
                         connCtx.beginPath();
                         connCtx.moveTo(x1, y1);
                         connCtx.lineTo(x2, y2);
-                        connCtx.strokeStyle = 'rgba(200, 160, 255, 0.15)';
+                        connCtx.strokeStyle = 'rgba(200, 160, 255, 0.2)';
                         connCtx.lineWidth = 1.5;
                         connCtx.stroke();
                     }
@@ -664,7 +689,7 @@
                     connCtx.beginPath();
                     connCtx.moveTo(x1, y1);
                     connCtx.lineTo(x2, y2);
-                    connCtx.strokeStyle = 'rgba(200, 160, 255, 0.1)';
+                    connCtx.strokeStyle = 'rgba(200, 160, 255, 0.15)';
                     connCtx.lineWidth = 1;
                     connCtx.stroke();
                 }
@@ -691,9 +716,11 @@
                 if (isOn) {
                     shapes.forEach(s => s.style.display = 'none');
                     if (cursor) cursor.style.display = 'none';
+                    document.body.style.cursor = 'default';
                 } else {
                     shapes.forEach(s => s.style.display = 'flex');
                     if (cursor) cursor.style.display = 'block';
+                    document.body.style.cursor = 'none';
                 }
             });
 
@@ -702,6 +729,11 @@
                     menuDropdown.style.display = 'none';
                 }
             });
+
+            // fix for mobile touch
+            if (window.innerWidth <= 600) {
+                document.body.style.cursor = 'auto';
+            }
         })();
     </script>
 </body>
