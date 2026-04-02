@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="description" content="Omar Emadaldeen — spotless academic record, pilot track, training.">
+    <title>Omar Emadaldeen</title>
+    <link rel="icon" href="BALL2.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: black;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* focus styles for keyboard navigation */
+        :focus-visible {
+            outline: 2px solid #e6b422;
+            outline-offset: 4px;
+            border-radius: 4px;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 12vh 40px 20vh;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: white;
+            text-shadow: 0 0 20px #e6b422, 0 0 8px rgba(230, 180, 34, 0.5);
+            margin-bottom: 3rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .facts {
+            width: 100%;
+            text-align: left;
+        }
+
+        p {
+            font-size: 1.6rem;
+            line-height: 1.5;
+            margin: 2.5rem 0;
+            font-weight: 380;
+            letter-spacing: -0.2px;
+            color: white;
+            transition: transform 0.1s ease, text-shadow 0.1s;
+        }
+
+        strong {
+            color: #e6b422;
+            font-weight: 500;
+        }
+
+        p:hover {
+            text-shadow: 0 0 12px rgba(230, 180, 34, 0.5);
+            transform: translateX(8px);
+        }
+
+        p {
+            transition: transform 0.08s linear;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .guestbook-link {
+            display: inline-block;
+            margin-top: 3rem;
+            color: #e6b422;
+            text-decoration: none;
+            font-size: 0.85rem;
+            border-bottom: 1px solid rgba(230, 180, 34, 0.4);
+            transition: all 0.2s;
+            font-family: monospace;
+        }
+
+        .guestbook-link:hover,
+        .guestbook-link:focus-visible {
+            color: #ffd966;
+            border-bottom-color: #ffd966;
+            transform: translateX(4px);
+            outline: none;
+        }
+
+        .back-link {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            color: #e6b422;
+            text-decoration: none;
+            font-size: 0.8rem;
+            border-bottom: 1px solid rgba(230, 180, 34, 0.4);
+            font-family: monospace;
+            z-index: 100;
+            transition: 0.2s;
+        }
+
+        .back-link:hover,
+        .back-link:focus-visible {
+            color: #ffd966;
+            border-bottom-color: #ffd966;
+            outline: none;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            #custom-cursor {
+                position: fixed;
+                width: 20px;
+                height: 20px;
+                pointer-events: none;
+                z-index: 10000;
+                transform: translate(-50%, -50%);
+            }
+            .cursor-line {
+                position: absolute;
+                background: #e6b422;
+            }
+            .cursor-line.horizontal {
+                width: 20px;
+                height: 1.5px;
+                top: 50%;
+                left: 0;
+                transform: translateY(-50%);
+            }
+            .cursor-line.vertical {
+                width: 1.5px;
+                height: 20px;
+                left: 50%;
+                top: 0;
+                transform: translateX(-50%);
+            }
+            body, a, p, h1 {
+                cursor: none;
+            }
+        }
+
+        /* mobile overrides */
+        @media (max-width: 700px) {
+            .container { padding: 8vh 24px 12vh; }
+            h1 { font-size: 2.2rem; margin-bottom: 1.8rem; text-shadow: 0 0 12px #e6b422; }
+            p { font-size: 1rem; margin: 1.4rem 0; line-height: 1.4; }
+            .guestbook-link { margin-top: 2rem; font-size: 0.75rem; }
+            .back-link { top: 16px; left: 16px; font-size: 0.7rem; }
+            #custom-cursor { display: none; }
+            p:hover { transform: none; text-shadow: none; }
+            .guestbook-link:hover { transform: none; }
+            .back-link:hover { transform: none; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div id="custom-cursor">
+    <div class="cursor-line horizontal"></div>
+    <div class="cursor-line vertical"></div>
+</div>
+
+<a href="index.html" class="back-link">← Back</a>
+
+<div class="container">
+    <h1>Omar Emadaldeen</h1>
+    
+    <div class="facts">
+        <p><strong>Academic record:</strong> Kg1 through Grade 10, spotless. No B's. Zero warnings. Consistent since day one. 16.</p>
+        <p><strong>Training:</strong> Gym 5x week. Kickboxing 3x week. Discipline isn't optional.</p>
+        <p><strong>Goals:</strong> Aviation school. Pilot track. Build TARS robot — voice, movement, personality, the whole thing. Finish Python. Build my own AI. Earn $1000 from something I built.</p>
+    </div>
+    
+    <a href="guestbook.html" class="guestbook-link">Leave a message →</a>
+</div>
+
+<script>
+    (function() {
+        const isMobile = window.innerWidth <= 700;
+        
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let shapes = [];
+        let glowingDots = [];
+        let animationId = null;
+        
+        class MovingShape {
+            constructor(type, x, y, size, vx, vy, rotSpeed, glowIntensity) {
+                this.type = type;
+                this.x = x;
+                this.y = y;
+                this.size = size;
+                this.angle = Math.random() * Math.PI * 2;
+                this.vx = vx;
+                this.vy = vy;
+                this.rotSpeed = rotSpeed;
+                this.glow = glowIntensity;
+                this.pulse = Math.random() * Math.PI * 2;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.angle += this.rotSpeed;
+                this.pulse += 0.02;
+                if (this.x < -0.2) this.x = 1.2;
+                if (this.x > 1.2) this.x = -0.2;
+                if (this.y < -0.2) this.y = 1.2;
+                if (this.y > 1.2) this.y = -0.2;
+            }
+            draw(ctx, w, h) {
+                const cx = this.x * w;
+                const cy = this.y * h;
+                const r = this.size * Math.min(w, h) * 0.07;
+                const glowFactor = this.glow * (0.7 + Math.sin(this.pulse) * 0.3);
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(this.angle);
+                ctx.beginPath();
+                ctx.strokeStyle = '#e6b422';
+                ctx.lineWidth = 1.5;
+                ctx.shadowBlur = 6 + glowFactor * 4;
+                ctx.shadowColor = '#e6b422';
+                
+                if (this.type === 'hex') {
+                    for (let i = 0; i < 6; i++) {
+                        const angle = (i * 60) * Math.PI / 180;
+                        const x1 = Math.cos(angle) * r;
+                        const y1 = Math.sin(angle) * r;
+                        if (i === 0) ctx.moveTo(x1, y1);
+                        else ctx.lineTo(x1, y1);
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+                } else if (this.type === 'triangle') {
+                    for (let i = 0; i < 3; i++) {
+                        const angle = (i * 120) * Math.PI / 180;
+                        const x1 = Math.cos(angle) * r;
+                        const y1 = Math.sin(angle) * r;
+                        if (i === 0) ctx.moveTo(x1, y1);
+                        else ctx.lineTo(x1, y1);
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+                } else if (this.type === 'square') {
+                    const s = r * 0.9;
+                    ctx.rect(-s/2, -s/2, s, s);
+                    ctx.stroke();
+                }
+                ctx.restore();
+            }
+        }
+        
+        class GlowDot {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 1.2 + 0.5;
+                this.alpha = Math.random() * 0.2 + 0.05;
+                this.pulse = Math.random() * Math.PI * 2;
+                this.speed = 0.005 + Math.random() * 0.01;
+            }
+            update() {
+                this.pulse += this.speed;
+            }
+            draw(ctx, w, h) {
+                const cx = this.x * w;
+                const cy = this.y * h;
+                const glow = this.alpha * (0.6 + Math.sin(this.pulse) * 0.4);
+                ctx.beginPath();
+                ctx.arc(cx, cy, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(230, 180, 34, ${glow})`;
+                ctx.shadowBlur = 2;
+                ctx.shadowColor = '#e6b422';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+        
+        function initShapes() {
+            if (isMobile) return;
+            const types = ['hex', 'triangle', 'square'];
+            const count = 14;
+            for (let i = 0; i < count; i++) {
+                shapes.push(new MovingShape(
+                    types[Math.floor(Math.random() * types.length)],
+                    Math.random(),
+                    Math.random(),
+                    0.7 + Math.random() * 1.2,
+                    (Math.random() - 0.5) * 0.006,
+                    (Math.random() - 0.5) * 0.006,
+                    0.0003 + Math.random() * 0.0006,
+                    0.5 + Math.random() * 0.8
+                ));
+            }
+        }
+        
+        function initGlowDots() {
+            const count = isMobile ? 50 : 120;
+            for (let i = 0; i < count; i++) {
+                glowingDots.push(new GlowDot(Math.random(), Math.random()));
+            }
+        }
+        
+        function drawBackground() {
+            if (!width || !height) return;
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, width, height);
+            
+            glowingDots.forEach(d => {
+                d.update();
+                d.draw(ctx, width, height);
+            });
+            
+            shapes.forEach(s => {
+                s.update();
+                s.draw(ctx, width, height);
+            });
+            
+            animationId = requestAnimationFrame(drawBackground);
+        }
+        
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+        });
+        resizeCanvas();
+        initShapes();
+        initGlowDots();
+        drawBackground();
+        
+        // magnetic pull — disabled on mobile
+        if (!isMobile) {
+            const facts = document.querySelectorAll('p');
+            let mouseX = 0, mouseY = 0;
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+            
+            function applyMagneticPull() {
+                facts.forEach(fact => {
+                    const rect = fact.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    const dx = mouseX - centerX;
+                    const dy = mouseY - centerY;
+                    const distance = Math.hypot(dx, dy);
+                    if (distance < 100) {
+                        const strength = (1 - distance / 100) * 3;
+                        const moveX = dx * 0.035 * strength;
+                        const moveY = dy * 0.018 * strength;
+                        fact.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                    } else {
+                        fact.style.transform = '';
+                    }
+                });
+                requestAnimationFrame(applyMagneticPull);
+            }
+            applyMagneticPull();
+        }
+        
+        // cursor
+        if (!isMobile) {
+            const customCursor = document.getElementById('custom-cursor');
+            if (customCursor && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+                let cx = width/2, cy = height/2;
+                document.addEventListener('mousemove', (e) => {
+                    requestAnimationFrame(() => {
+                        cx = e.clientX;
+                        cy = e.clientY;
+                        customCursor.style.left = cx + 'px';
+                        customCursor.style.top = cy + 'px';
+                    });
+                });
+                document.addEventListener('mouseleave', () => customCursor.style.opacity = '0');
+                document.addEventListener('mouseenter', () => customCursor.style.opacity = '1');
+            }
+        }
+    })();
+</script>
+</body>
+</html>

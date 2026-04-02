@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>guestbook | OEA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f0f0;
+            font-family: 'Courier New', 'SF Mono', monospace;
+            min-height: 100vh;
+            color: #0a4a2a;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 40px;
+            color: #0a4a2a;
+            text-decoration: none;
+            font-size: 0.85rem;
+            border-bottom: 1px solid #0a4a2a;
+            font-family: monospace;
+        }
+
+        .back-link:hover {
+            color: #0c5c34;
+            border-bottom-color: #0c5c34;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            font-weight: normal;
+            color: #0a4a2a;
+            margin-bottom: 2rem;
+            letter-spacing: 1px;
+            border-left: 2px solid #0a4a2a;
+            padding-left: 16px;
+        }
+
+        .form-card {
+            background: white;
+            border: 1px solid #ccc;
+            padding: 24px;
+            margin-bottom: 40px;
+        }
+
+        input, textarea {
+            width: 100%;
+            background: white;
+            border: 1px solid #aaa;
+            padding: 10px 12px;
+            margin-bottom: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #0a4a2a;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #0a4a2a;
+        }
+
+        button {
+            background: #0a4a2a;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border-radius: 0;
+        }
+
+        button:hover {
+            background: #0c5c34;
+        }
+
+        .error {
+            color: #a00;
+            font-size: 0.75rem;
+            margin-top: -10px;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        .messages {
+            background: white;
+            border: 1px solid #ccc;
+            padding: 24px;
+        }
+
+        .messages h2 {
+            font-size: 0.9rem;
+            font-weight: normal;
+            color: #0a4a2a;
+            margin-bottom: 1rem;
+            border-left: 2px solid #0a4a2a;
+            padding-left: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .log-entry {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            padding: 6px 0;
+            border-bottom: 1px solid #e0e0e0;
+            color: #0a4a2a;
+        }
+
+        .log-entry strong {
+            color: #0a4a2a;
+            font-weight: normal;
+        }
+
+        .empty-log {
+            color: #888;
+            font-size: 0.8rem;
+            padding: 12px 0;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 40px 20px; }
+            .form-card, .messages { padding: 16px; }
+            input, textarea { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="about.html" class="back-link">← back</a>
+        
+        <h1>guestbook</h1>
+        
+        <div class="form-card">
+            <input type="text" id="guestName" placeholder="name" maxlength="40">
+            <textarea id="guestMsg" rows="2" placeholder="message" maxlength="300"></textarea>
+            <div id="formError" class="error"></div>
+            <button id="sendBtn">record</button>
+        </div>
+        
+        <div class="messages">
+            <h2>log</h2>
+            <div id="logContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        let lastPost = 0;
+        const COOLDOWN = 20000;
+
+        function loadLog() {
+            let entries = JSON.parse(localStorage.getItem('oea_guestbook') || '[]');
+            let container = document.getElementById('logContainer');
+            if (!container) return;
+            
+            if (entries.length === 0) {
+                container.innerHTML = '<div class="empty-log">— empty —</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            entries.slice().reverse().forEach(entry => {
+                let div = document.createElement('div');
+                div.className = 'log-entry';
+                div.innerHTML = `<strong>${escapeHtml(entry.date)} — ${escapeHtml(entry.name || 'anon')}</strong><br>${escapeHtml(entry.text)}`;
+                container.appendChild(div);
+            });
+        }
+
+        function saveEntry(name, text) {
+            let entries = JSON.parse(localStorage.getItem('oea_guestbook') || '[]');
+            entries.push({
+                name: name || 'anon',
+                text: text,
+                date: new Date().toLocaleString()
+            });
+            if (entries.length > 100) entries.shift();
+            localStorage.setItem('oea_guestbook', JSON.stringify(entries));
+            loadLog();
+            return true;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+        }
+
+        function showError(msg) {
+            let err = document.getElementById('formError');
+            err.textContent = msg;
+            err.style.display = 'block';
+            setTimeout(() => err.style.display = 'none', 2000);
+        }
+
+        document.getElementById('sendBtn').addEventListener('click', () => {
+            let name = document.getElementById('guestName').value.trim();
+            let msg = document.getElementById('guestMsg').value.trim();
+            
+            if (!msg) {
+                showError('message cannot be empty');
+                return;
+            }
+            if (msg.length > 300) {
+                showError('message too long (max 300 chars)');
+                return;
+            }
+            
+            let now = Date.now();
+            if (now - lastPost < COOLDOWN) {
+                let wait = Math.ceil((COOLDOWN - (now - lastPost)) / 1000);
+                showError(`wait ${wait} seconds`);
+                return;
+            }
+            
+            if (saveEntry(name, msg)) {
+                document.getElementById('guestMsg').value = '';
+                document.getElementById('guestName').value = '';
+                lastPost = now;
+            } else {
+                showError('storage failed');
+            }
+        });
+
+        loadLog();
+    </script>
+</body>
+</html>
