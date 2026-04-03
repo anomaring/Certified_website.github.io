@@ -31,12 +31,6 @@
             text-decoration: none;
             font-size: 0.85rem;
             border-bottom: 1px solid #0a4a2a;
-            font-family: monospace;
-        }
-
-        .back-link:hover {
-            color: #0c5c34;
-            border-bottom-color: #0c5c34;
         }
 
         h1 {
@@ -44,7 +38,6 @@
             font-weight: normal;
             color: #0a4a2a;
             margin-bottom: 2rem;
-            letter-spacing: 1px;
             border-left: 2px solid #0a4a2a;
             padding-left: 16px;
         }
@@ -80,11 +73,15 @@
             font-family: 'Courier New', monospace;
             font-size: 0.85rem;
             cursor: pointer;
-            border-radius: 0;
         }
 
-        button:hover {
+        button:hover:not(:disabled) {
             background: #0c5c34;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .error {
@@ -131,6 +128,12 @@
             padding: 12px 0;
         }
 
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+        }
+
         @media (max-width: 600px) {
             .container { padding: 40px 20px; }
             .form-card, .messages { padding: 16px; }
@@ -153,61 +156,114 @@
         
         <div class="messages">
             <h2>log</h2>
-            <div id="logContainer"></div>
+            <div id="logContainer"><div class="loading">loading messages...</div></div>
         </div>
     </div>
 
     <script>
+        // ===== CONFIGURATION =====
+        // REPLACE THESE WITH YOUR ACTUAL VALUES
+        const GITHUB_TOKEN = 'YOUR_GITHUB_TOKEN_HERE';
+        const GITHUB_USER = 'YOUR_GITHUB_USERNAME';
+        const REPO_NAME = 'guestbook-data';
+        
+        // ===== END CONFIG =====
+        
+        const API_URL = `https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/issues`;
+        
         let lastPost = 0;
         const COOLDOWN = 20000;
-
-        function loadLog() {
-            let entries = JSON.parse(localStorage.getItem('oea_guestbook') || '[]');
-            let container = document.getElementById('logContainer');
-            if (!container) return;
+        
+        async function loadMessages() {
+            const container = document.getElementById('logContainer');
+            container.innerHTML = '<div class="loading">loading messages...</div>';
             
-            if (entries.length === 0) {
-                container.innerHTML = '<div class="empty-log">— empty —</div>';
-                return;
+            try {
+                const response = await fetch(API_URL + '?state=open&per_page=50&sort=created&direction=desc', {
+                    headers: {
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Failed to load');
+                
+                const issues = await response.json();
+                
+                if (issues.length === 0) {
+                    container.innerHTML = '<div class="empty-log">— empty —</div>';
+                    return;
+                }
+                
+                container.innerHTML = '';
+                issues.forEach(issue => {
+                    // parse title: "Name | date"
+                    let name = 'anon';
+                    let date = '';
+                    let titleParts = issue.title.split(' | ');
+                    if (titleParts.length >= 2) {
+                        name = titleParts[0];
+                        date = titleParts[1];
+                    } else {
+                        date = new Date(issue.created_at).toLocaleString();
+                    }
+                    
+                    let div = document.createElement('div');
+                    div.className = 'log-entry';
+                    div.innerHTML = `<strong>${escapeHtml(date)} — ${escapeHtml(name)}</strong><br>${escapeHtml(issue.body || '')}`;
+                    container.appendChild(div);
+                });
+                
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = '<div class="empty-log">failed to load messages</div>';
+            }
+        }
+        
+        async function postMessage(name, text) {
+            const dateStr = new Date().toLocaleString();
+            const title = `${name || 'anon'} | ${dateStr}`;
+            
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${GITHUB_TOKEN}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: title,
+                    body: text,
+                    labels: ['guestbook']
+                })
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'failed to post');
             }
             
-            container.innerHTML = '';
-            entries.slice().reverse().forEach(entry => {
-                let div = document.createElement('div');
-                div.className = 'log-entry';
-                div.innerHTML = `<strong>${escapeHtml(entry.date)} — ${escapeHtml(entry.name || 'anon')}</strong><br>${escapeHtml(entry.text)}`;
-                container.appendChild(div);
-            });
-        }
-
-        function saveEntry(name, text) {
-            let entries = JSON.parse(localStorage.getItem('oea_guestbook') || '[]');
-            entries.push({
-                name: name || 'anon',
-                text: text,
-                date: new Date().toLocaleString()
-            });
-            if (entries.length > 100) entries.shift();
-            localStorage.setItem('oea_guestbook', JSON.stringify(entries));
-            loadLog();
             return true;
         }
-
+        
         function escapeHtml(str) {
             if (!str) return '';
             return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
         }
-
+        
         function showError(msg) {
-            let err = document.getElementById('formError');
-            err.textContent = msg;
-            err.style.display = 'block';
-            setTimeout(() => err.style.display = 'none', 2000);
+            const errDiv = document.getElementById('formError');
+            errDiv.textContent = msg;
+            errDiv.style.display = 'block';
+            setTimeout(() => errDiv.style.display = 'none', 3000);
         }
-
-        document.getElementById('sendBtn').addEventListener('click', () => {
-            let name = document.getElementById('guestName').value.trim();
-            let msg = document.getElementById('guestMsg').value.trim();
+        
+        const sendBtn = document.getElementById('sendBtn');
+        const nameInput = document.getElementById('guestName');
+        const msgInput = document.getElementById('guestMsg');
+        
+        sendBtn.addEventListener('click', async () => {
+            const name = nameInput.value.trim();
+            const msg = msgInput.value.trim();
             
             if (!msg) {
                 showError('message cannot be empty');
@@ -218,23 +274,32 @@
                 return;
             }
             
-            let now = Date.now();
+            const now = Date.now();
             if (now - lastPost < COOLDOWN) {
-                let wait = Math.ceil((COOLDOWN - (now - lastPost)) / 1000);
+                const wait = Math.ceil((COOLDOWN - (now - lastPost)) / 1000);
                 showError(`wait ${wait} seconds`);
                 return;
             }
             
-            if (saveEntry(name, msg)) {
-                document.getElementById('guestMsg').value = '';
-                document.getElementById('guestName').value = '';
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'sending...';
+            
+            try {
+                await postMessage(name, msg);
+                nameInput.value = '';
+                msgInput.value = '';
                 lastPost = now;
-            } else {
-                showError('storage failed');
+                await loadMessages();
+            } catch (err) {
+                console.error(err);
+                showError(err.message || 'failed to post');
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'record';
             }
         });
-
-        loadLog();
+        
+        loadMessages();
     </script>
 </body>
 </html>
